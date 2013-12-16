@@ -2,6 +2,7 @@ import socket
 import json
 import sys
 from searchclass import SearchResult
+import helper
 
 UDP_IP = None
 UDP_PORT = 8767 # default port
@@ -22,7 +23,7 @@ if boot_arg in sys.argv:
 	try:
 		boot_val = sys.argv[sys.argv.index(boot_arg)+1] 
 	except IndexError:
-		sys.exit('No value for the id argument. (--id value) Error!')
+		sys.exit('No value for the boot argument. (--boot value) Error!')
 else:
 	if bootstrap_arg in sys.argv and id_arg in sys.argv:
 		try:
@@ -64,25 +65,21 @@ else:
 	if bootstrap_val:
 		UDP_IP = bootstrap_val # connect to the given IP addr
 
+# bind first socket to selected IP and PORT (because port could be changed from arguments)
 first_socket.bind((UDP_IP, UDP_PORT))
-first_object = SearchResult(first_socket)
+# create first object
+first_object = SearchResult(first_socket, helper.hashCode("distributed"))
 
-# add one more node
-
+# add one more node to first port+1 and same IP
 second_port = UDP_PORT + 1;
 second_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 second_socket.bind((UDP_IP, second_port))
-second_object = SearchResult(second_socket)
+# create second object
+second_object = SearchResult(second_socket, helper.hashCode("systems"))
 
+
+# ask second object to join the network!!!
 second_object.joinNetwork((UDP_IP, UDP_PORT),'', '')
 
 while 1:
 	pass
-
-# public int hashCode(String str) {
-#   int hash = 0;
-#   for (int i = 0; i < str.length(); i++) {
-#     hash = hash * 31 + str.charAt(i);
-#   }
-#   return Math.abs(hash);
-# }

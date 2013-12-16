@@ -1,7 +1,25 @@
 import json
+import math
 
+
+# Helper file containing constant values, and usefull functions
+
+# CONSTANT VALUES
 join_message = "JOINING_NETWORK_SIMPLIFIED"
 
+
+
+# FUNCTIONS
+
+# hash function
+def hashCode(str_value):
+	hash = 0
+	for c in str_value:
+		hash = hash * 31 + ord(c)
+	return math.fabs(hash)
+
+
+# function to build the json of join message
 def build_join_message (node_id, target_id, ip_address):
 	message_structure = {}
 	message_structure["type"] = "JOINING_NETWORK_SIMPLIFIED"
