@@ -16,12 +16,12 @@ def receive_messages(socket):
 
 class PeerSearchSimplified:
 	socket = None
-	id = None
+	node_id = None
 
 	def __init__ (self, udp_socket, node_id):
 		# initialise with a udp socket
 		socket = udp_socket;
-		id = node_id;
+		self.node_id = node_id;
 		print socket.getsockname()
 		try:
 			thread.start_new_thread( receive_messages, (udp_socket,) )
@@ -30,7 +30,7 @@ class PeerSearchSimplified:
 
 	def joinNetwork (self, (bootstrap_node_ip,bootstrap_node_port), identifier, target_identifier):
 		print "JOINING! (bootstrap @ "+ bootstrap_node_ip + ':' + `bootstrap_node_port` + ')'
-		message = helper.build_join_message(self.getID(), target_identifier, bootstrap_node_ip)
+		message = helper.build_join_message(self.node_id, target_identifier, bootstrap_node_ip)
 		message_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 		message_socket.sendto(message, (bootstrap_node_ip, bootstrap_node_port))
 		# returns network_id, a locally
@@ -45,10 +45,3 @@ class PeerSearchSimplified:
 
 	def search (self, words):
 		print ('HEllo')
-
-	def getID (self):
-		return self.id
-
-
-
-	

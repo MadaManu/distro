@@ -79,6 +79,8 @@ second_object = SearchResult(second_socket, helper.hashCode("systems"))
 
 
 # ask second object to join the network!!!
+# why need identifier, target_identifier in join network - if bootstrap is known and the peer
+# to be added is just calling the method
 second_object.joinNetwork((UDP_IP, UDP_PORT),'', '')
 
 while 1:
