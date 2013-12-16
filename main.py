@@ -4,12 +4,13 @@ import sys
 from searchclass import SearchResult
 
 UDP_IP = None
-UDP_PORT = 8767
+UDP_PORT = 8767 # default port
 
 
 
 
-
+port_arg = '--port'
+port_val = None
 boot_arg = '--boot'
 boot_val = None
 bootstrap_arg = '--bootstrap'
@@ -44,8 +45,17 @@ else:
 		if id_arg not in sys.argv:
 			sys.exit("No id argument (--id) given. Error!")
 
+if port_arg in sys.argv:
+	port_val = sys.argv[sys.argv.index(port_arg)+1]
+
+if port_val:
+	if int(port_val) > 65535 or int(port_val) < 0:
+		sys.exit("Port must be 0 - 65535. Error!")
+	else:
+		UDP_PORT = int(port_val)
+
 # define the socket to deal with all the connections
-socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP connections
+first_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP connections
 
 # assign the specific IP 		
 if boot_val:
@@ -54,41 +64,25 @@ else:
 	if bootstrap_val:
 		UDP_IP = bootstrap_val # connect to the given IP addr
 
-socket.bind((UDP_IP, UDP_PORT))
-first_object = SearchResult(socket)
+first_socket.bind((UDP_IP, UDP_PORT))
+first_object = SearchResult(first_socket)
 
+# add one more node
 
+second_port = UDP_PORT + 1;
+second_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+second_socket.bind((UDP_IP, second_port))
+second_object = SearchResult(second_socket)
 
+second_object.joinNetwork((UDP_IP, UDP_PORT),'', '')
 
+while 1:
+	pass
 
 # public int hashCode(String str) {
 #   int hash = 0;
 #   for (int i = 0; i < str.length(); i++) {
 #     hash = hash * 31 + str.charAt(i);
 #   }
-#   return hash;
+#   return Math.abs(hash);
 # }
-
-
-
-
-# import thread
-# import time
-
-# # Define a function for the thread
-# def print_time( threadName, delay):
-#    count = 0
-#    while count < 5:
-#       time.sleep(delay)
-#       count += 1
-#       print "%s: %s" % ( threadName, time.ctime(time.time()) )
-
-# # Create two threads as follows
-# try:
-#    thread.start_new_thread( print_time, ("Thread-1", 2, ) )
-#    thread.start_new_thread( print_time, ("Thread-2", 4, ) )
-# except:
-#    print "Error: unable to start thread"
-
-# while 1:
-#    pass
