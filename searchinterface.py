@@ -4,27 +4,35 @@ import socket
 import json
 import helper
 
-# thread function to deal with all the messages that are received
-def receive_messages(socket):
-	print socket.getsockname()
-	while 1:
-		data, addr = socket.recvfrom(1024)
-		print "received message:", data
-		message_data = json.loads(data)
-		if message_data["type"] == helper.join_message:
-			print 'Wanna join?'
+
+
 
 class PeerSearchSimplified:
 	socket = None
 	node_id = None
-
+	routing_table = None
+	
+	# thread function to deal with all the messages that are received
+	def receive_messages(self, socket):
+		print socket.getsockname()
+		while 1:
+			data, addr = socket.recvfrom(1024)
+			print "received message:", data
+			message_data = json.loads(data)
+			if message_data["type"] == helper.join_message:
+				print 'Wanna join?'
+			elif message_data["type"] == helper.join_relay_message:
+				print 'the relay message'		
+			elif message_data["type"] == helper.routing_info_message:
+				print 'save the routing table'
+	
 	def __init__ (self, udp_socket, node_id):
 		# initialise with a udp socket
 		socket = udp_socket;
 		self.node_id = node_id;
 		print socket.getsockname()
 		try:
-			thread.start_new_thread( receive_messages, (udp_socket,) )
+			thread.start_new_thread( self.receive_messages, (udp_socket,) )
 		except Exception as error:
 			print error
 

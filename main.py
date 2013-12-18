@@ -1,7 +1,7 @@
 import socket
 import json
 import sys
-from searchclass import SearchResult
+from searchinterface import PeerSearchSimplified
 import helper
 
 UDP_IP = None
@@ -68,14 +68,14 @@ else:
 # bind first socket to selected IP and PORT (because port could be changed from arguments)
 first_socket.bind((UDP_IP, UDP_PORT))
 # create first object
-first_object = SearchResult(first_socket, helper.hashCode("distributed"))
+first_object = PeerSearchSimplified(first_socket, helper.hashCode("distributed"))
 
 # add one more node to first port+1 and same IP
 second_port = UDP_PORT + 1;
 second_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 second_socket.bind((UDP_IP, second_port))
 # create second object
-second_object = SearchResult(second_socket, helper.hashCode("systems"))
+second_object = PeerSearchSimplified(second_socket, helper.hashCode("systems"))
 
 
 # ask second object to join the network!!!
