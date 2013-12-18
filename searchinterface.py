@@ -25,6 +25,18 @@ class PeerSearchSimplified:
 				print 'the relay message'		
 			elif message_data["type"] == helper.routing_info_message:
 				print 'save the routing table'
+			elif message_data["type"] == helper.leaving_message:
+				print 'u telling me u want to leave? so fast?'
+			elif message_data["type"] == helper.index_message:
+				print 'let me index that for u'
+			elif message_data["type"] == helper.search:
+				print 'what do we search?'
+			elif message_data["type"] == helper.search_response_type:
+				print 'this is the response of my search?'
+			elif message_data["type"] == helper.ping:
+				print 'Do u really want to know if i\'m alive?'
+			elif message_data["type"] == helper.ack:
+				print 'ok... u acknowledged... i take count of that'
 	
 	def __init__ (self, udp_socket, node_id):
 		# initialise with a udp socket
