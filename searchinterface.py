@@ -8,9 +8,10 @@ import helper
 
 
 class PeerSearchSimplified:
-	socket = None
 	node_id = None
 	routing_table = None
+	response_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+	socket = None
 	
 	# thread function to deal with all the messages that are received
 	def receive_messages(self, socket):
@@ -19,8 +20,15 @@ class PeerSearchSimplified:
 			data, addr = socket.recvfrom(1024)
 			print "received message:", data
 			message_data = json.loads(data)
+			
 			if message_data["type"] == helper.join_message:
 				print 'Wanna join?'
+				response_message = helper.build_routing_table_message(message_data["node_id"], self.socket.getsockname(), self.routing_table)
+				print response_message
+				# send back the routing info that is saved in bootstrap node to the joining node
+				self.response_socket.sendto(response_message, (message_data["ip_address"], message_data["port"]))
+				# add the new node to the routing table
+				routing_table[]
 			elif message_data["type"] == helper.join_relay_message:
 				print 'the relay message'		
 			elif message_data["type"] == helper.routing_info_message:
@@ -40,19 +48,21 @@ class PeerSearchSimplified:
 	
 	def __init__ (self, udp_socket, node_id):
 		# initialise with a udp socket
-		socket = udp_socket;
+		self.socket = udp_socket;
 		self.node_id = node_id;
-		print socket.getsockname()
+		print self.socket.getsockname()
 		try:
 			thread.start_new_thread( self.receive_messages, (udp_socket,) )
 		except Exception as error:
 			print error
 
-	def joinNetwork (self, (bootstrap_node_ip,bootstrap_node_port), identifier, target_identifier):
+# removed the need for identifier because the node that want's to join the network already has its own
+# identifier saved as an attribute, therefore no need to pass it in.
+	def joinNetwork (self, (bootstrap_node_ip,bootstrap_node_port), target_identifier):
 		print "JOINING! (bootstrap @ "+ bootstrap_node_ip + ':' + `bootstrap_node_port` + ')'
-		message = helper.build_join_message(self.node_id, target_identifier, bootstrap_node_ip)
-		message_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-		message_socket.sendto(message, (bootstrap_node_ip, bootstrap_node_port))
+		message = helper.build_join_message(self.node_id, target_identifier, self.socket.getsockname())
+		self.response_socket.sendto(message, (bootstrap_node_ip, bootstrap_node_port))
+		
 		# returns network_id, a locally
 		# generated number to identify peer network
 

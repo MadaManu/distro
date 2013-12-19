@@ -25,12 +25,13 @@ def hashCode(str_value):
 		hash = hash * 31 + ord(c)
 	return math.fabs(hash)
 
-def build_join_message (node_id, target_id, ip_address):
+def build_join_message (node_id, target_id, (ip_address, port)):
 	message_structure = {}
 	message_structure["type"] = join_message
 	message_structure["node_id"] = node_id # a non-negative number of order 2'^32^', indicating the id of the joining node
 	message_structure["target_id"] = target_id # a non-negative number of order 2'^32^', indicating the target node for this message
 	message_structure["ip_address"] = ip_address # the ip address of the joining node
+	message_structure["port"] = port # the ip address of the joining node
 	return json.dumps(message_structure, sort_keys=True, indent=4, separators=(',', ': '))
 
 def build_join_relay_message (node_id, gateway_id):
@@ -40,12 +41,12 @@ def build_join_relay_message (node_id, gateway_id):
 	message_structure["gateway_id"] = gateway_id
 	return json.dumps(message_structure, sort_keys=True, indent=4, separators=(',', ': '))
 
-def build_routing_table_message (gateway_id, node_id, ip_address, route_table):
+def build_routing_table_message (node_id, (ip_address, port), route_table):
 	message_structure = {}
 	message_structure["type"] = routing_info_message
-	message_structure["gateway_id"] = gateway_id
 	message_structure["node_id"] = node_id
 	message_structure["ip_address"] = ip_address
+	message_structure["port"] = port
 	message_structure["route_table"] = route_table
 	return json.dumps(message_structure, sort_keys=True, indent=4, separators=(',', ': '))
 
@@ -95,3 +96,19 @@ def build_ack_message (node_id, ip_address):
 	message_structure["node_id"] = node_id
 	message_structure["ip_address"] = ip_address
 	return json.dumps(message_structure, sort_keys=True, indent=4, separators=(',', ': '))
+
+
+
+# you should send a an url to that node from any other node
+
+# node11.index("tcd.com",TCD)
+
+# node1 recieves this and link the URL to the keyword
+
+# and you build a list
+
+# search is when you give a keyword TCD
+
+# you message the node that has the keyword TCD
+
+# and it should return the list of URL

@@ -81,7 +81,9 @@ second_object = PeerSearchSimplified(second_socket, helper.hashCode("systems"))
 # ask second object to join the network!!!
 # why need identifier, target_identifier in join network - if bootstrap is known and the peer
 # to be added is just calling the method
-second_object.joinNetwork((UDP_IP, UDP_PORT),'', '')
+
+# picked the node called distributed as the bootstrap node
+second_object.joinNetwork((UDP_IP, UDP_PORT), helper.hashCode("distributed"))
 
 while 1:
 	pass
