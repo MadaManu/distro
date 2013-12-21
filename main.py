@@ -93,8 +93,8 @@ third_socket.bind((UDP_IP, third_port))
 third_object = PeerSearchSimplified(third_socket, 15)
 third_object.joinNetwork((UDP_IP, UDP_PORT), 42)
 
-
-# third_object.leaveNetwork()
+# make a node leave
+# third_object.leaveNetwork() 
 
 
 raw_input("Press Enter to continue...")

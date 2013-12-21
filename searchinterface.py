@@ -39,6 +39,7 @@ class PeerSearchSimplified:
 				if add_here:
 					# if there is no other node closer, reply with the existing routing table
 					# print "sending back the routing table"
+
 					response_message = helper.build_routing_table_message(message_data["node_id"], self.node_id, self.socket.getsockname(), self.routing_table)
 					# send back the routing info that is saved in bootstrap node to the joining node
 					self.response_socket.sendto(response_message, (message_data["ip_address"], message_data["port"]))
@@ -112,8 +113,11 @@ class PeerSearchSimplified:
 
 
 			elif message_data["type"] == helper.leaving_message:
-				print 'u telling me u want to leave? so fast?'
-				self.routing_table.pop(message_data["node_id"])
+				# just remove the node_id from your routing table
+				if message_data["node_id"] in self.routing_table:
+					self.routing_table.pop(message_data["node_id"])
+
+
 			elif message_data["type"] == helper.index_message:
 				print 'let me index that for u'
 			elif message_data["type"] == helper.search:
@@ -130,7 +134,7 @@ class PeerSearchSimplified:
 		self.socket = udp_socket
 		self.node_id = node_id
 		self.routing_table = {}
-		print self.socket.getsockname()
+		# print self.socket.getsockname()
 		try:
 			thread.start_new_thread( self.receive_messages, (udp_socket,) )
 		except Exception as error:
@@ -139,15 +143,18 @@ class PeerSearchSimplified:
 # removed the need for identifier because the node that want's to join the network already has its own
 # identifier saved as an attribute, therefore no need to pass it in.
 	def joinNetwork (self, (bootstrap_node_ip,bootstrap_node_port), target_identifier):
-		print "JOINING! (bootstrap @ "+ bootstrap_node_ip + ':' + `bootstrap_node_port` + ')'
+		# print "JOINING! (bootstrap @ "+ bootstrap_node_ip + ':' + `bootstrap_node_port` + ')'
 		message = helper.build_join_message(self.node_id, target_identifier, self.socket.getsockname())
 		self.response_socket.sendto(message, (bootstrap_node_ip, bootstrap_node_port))
 
 	def leaveNetwork (self):
+
 		response_message = helper.build_leaving_message(self.node_id)
+		print self.routing_table
 		for node in self.routing_table:
-			self.response_socket.sendto(response_message, self.routing_table[node])
-		print ('HEllo')
+			print self.routing_table[node]
+			self.response_socket.sendto(response_message, tuple(self.routing_table[node]))
+		
 
 	def indexPage (self, url, unique_words):
 		print (url+' '+str(unique_words))
