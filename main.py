@@ -97,7 +97,7 @@ third_object.joinNetwork((UDP_IP, UDP_PORT), 42)
 fourth_port = UDP_PORT + 3
 fourth_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 fourth_socket.bind((UDP_IP, fourth_port))
-fourth_object = PeerSearchSimplified(fourth_socket, 9)
+fourth_object = PeerSearchSimplified(fourth_socket, 8)
 fourth_object.joinNetwork((UDP_IP, UDP_PORT), 42)
 
 # make a node leave

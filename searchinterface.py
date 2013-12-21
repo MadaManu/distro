@@ -54,7 +54,6 @@ class PeerSearchSimplified:
 					self.temporary_bootstraps[int(message_data["node_id"])] = (message_data["ip_address"], message_data["port"])
 					# print "THE MIN KEY IP / PORT", self.routing_table[min_key]
 					# send the relay!
-
 					self.response_socket.sendto(response_message, self.routing_table[min_key])
 
 
@@ -73,6 +72,8 @@ class PeerSearchSimplified:
 						local_min = self.node_id - message_data["node_id"] if self.node_id > message_data["node_id"] else message_data["node_id"] - self.node_id
 						if min_difference < local_min:
 							to_be_passed = True
+						else:
+							to_be_passed = False
 
 					if to_be_passed:
 						# TODo
@@ -151,7 +152,6 @@ class PeerSearchSimplified:
 		self.response_socket.sendto(message, (bootstrap_node_ip, bootstrap_node_port))
 
 	def leaveNetwork (self):
-
 		response_message = helper.build_leaving_message(self.node_id)
 		print self.routing_table
 		for node in self.routing_table:
