@@ -104,3 +104,9 @@ second_object.print_routing()
 print "15 routing info"
 third_object.print_routing()
 
+# THIS IS HOW TO CHECK IF VALUE IS TUPLE
+# if type(4567890) is tuple:
+# 	print "yes"
+# else:
+# 	print "no"
+

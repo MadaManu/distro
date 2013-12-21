@@ -12,6 +12,7 @@ class PeerSearchSimplified:
 	routing_table = {}
 	response_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 	socket = None
+	temporary_bootstraps = {}
 	
 	# thread function to deal with all the messages that are received
 	def receive_messages(self, socket):
@@ -48,23 +49,48 @@ class PeerSearchSimplified:
 					print "THIS IS THE MINIMUM KEEEY!"
 					print min_key
 					response_message = helper.build_join_relay_message(message_data["node_id"], min_key, self.node_id)
-					# print response_message
+					# save the temporary bootstrap
+					self.temporary_bootstraps[message_data["node_id"]] = (message_data["ip_address"], message_data["port"])
 					print "THE MIN KEY IP / PORT"
 					print self.routing_table[min_key][1]
-
+					# send the relay!
 					self.response_socket.sendto(response_message, self.routing_table[min_key])
-					print "PASS ON THE JOIN REQUEST! USING RELAY!!!!!!!!!<<!<<!<!<!<!<<!<!<!"
 
 			elif message_data["type"] == helper.join_relay_message:
-				response_message = helper.build_routing_table_message(message_data["node_id"], message_data["gateway_id"], self.socket.getsockname(), self.routing_table)
+				print 'the relay message'
+				print message_data
+				if message_data["target_id"] == self.node_id:
+					# check for hop in own routing table
+					# if node minimum distance then reply with message
+					# otherwise save in own temporary_bootstraps where to root back
 
-				print 'the relay message'		
+
+					response_message = helper.build_routing_table_message(message_data["node_id"], message_data["gateway_id"], self.socket.getsockname(), self.routing_table)
+					self.response_socket.sendto(response_message, self.routing_table[message_data["gateway_id"]])
+					print "routing table passed back to gateway (" + `message_data["gateway_id"]` + ")"
+
+				
 			elif message_data["type"] == helper.routing_info_message:
-				# save the routing table that we got from bootstraping
-				self.routing_table = message_data["route_table"]
-				self.routing_table[message_data["gateway_id"]] = (message_data["ip_address"], message_data["port"])
-				# add the bootstrap node to the routing table !!!! todo
-				print 'save the routing table'
+
+
+
+				# use the data only if the given node is the recipient
+				if self.node_id == message_data["node_id"]:
+					# save the routing table that we got from bootstraping
+					self.routing_table = helper.append_to_routing_table(self.routing_table, message_data["route_table"])
+					# self.routing_table = message_data["route_table"]
+					self.routing_table[message_data["gateway_id"]] = (message_data["ip_address"], message_data["port"])
+					# add the bootstrap node to the routing table !!!! 
+					print 'save the routing table'
+				else:
+					# check if needs to be passed to gateway or to saved node
+					# if self.node_id == message_data["gateway_id"]: # if the node is the gateway - check temporary bootstraps
+						#check temporary bootstraps HERE TODO
+					print "checking temporary bootstraps"
+					# else: # you are not the gateway yet
+
+					response_message = message_data # copy the routing message
+					print "pass the ROUTING TABLE ONWARDS!>!>!>!>!>!>"
 			elif message_data["type"] == helper.leaving_message:
 				print 'u telling me u want to leave? so fast?'
 			elif message_data["type"] == helper.index_message:
