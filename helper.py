@@ -30,9 +30,7 @@ def append_to_routing_table(existing_table, to_append):
 	if to_append:
 		for key in to_append:
 			existing_table[key] = to_append[key]
-		return existing_table
-	else:
-		return {}
+	return existing_table
 
 def find_closest_node (routing_table, node_id):
 	min_difference = sys.maxsize

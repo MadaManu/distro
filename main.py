@@ -90,19 +90,25 @@ second_object.joinNetwork((UDP_IP, UDP_PORT), 42)
 third_port = UDP_PORT + 2
 third_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 third_socket.bind((UDP_IP, third_port))
-
 third_object = PeerSearchSimplified(third_socket, 15)
-
 third_object.joinNetwork((UDP_IP, UDP_PORT), 42)
+
+
+# third_object.leaveNetwork()
+
+
 raw_input("Press Enter to continue...")
-print "42 ROUTING INFO!"
+print "\n42 ROUTING INFO!!!!"
 first_object.print_routing()
+print "-------------------\n"
 
 print "17 ROUTING INFO!!!!"
 second_object.print_routing()
+print "-------------------\n"
 
-print "15 routing info"
+print "15 ROUTING INFO!!!!"
 third_object.print_routing()
+print "-------------------\n"
 
 # THIS IS HOW TO CHECK IF VALUE IS TUPLE
 # if type(4567890) is tuple:
