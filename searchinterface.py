@@ -50,7 +50,7 @@ class PeerSearchSimplified:
 					print min_key
 					response_message = helper.build_join_relay_message(message_data["node_id"], min_key, self.node_id)
 					# save the temporary bootstrap
-					self.temporary_bootstraps[message_data["node_id"]] = (message_data["ip_address"], message_data["port"])
+					self.temporary_bootstraps[message_data["node_id"]] = (str(message_data["ip_address"]), message_data["port"])
 					print "THE MIN KEY IP / PORT"
 					print self.routing_table[min_key][1]
 					# send the relay!
@@ -63,11 +63,24 @@ class PeerSearchSimplified:
 					# check for hop in own routing table
 					# if node minimum distance then reply with message
 					# otherwise save in own temporary_bootstraps where to root back
+					(min_key, min_difference) = helper.find_closest_node (self.routing_table, message_data["node_id"])
+					to_be_passed = False
+					if min_key:
+						local_min = self.node_id - message_data["node_id"] if self.node_id > message_data["node_id"] else message_data["node_id"] - self.node_id
+						if min_difference < local_min:
+							to_be_passed = True
 
+					if to_be_passed:
+						print "TO BE PASSED AWAY!!!"
+						# add to temporary bootstraps and send to new gateway!
+						print "adding to bootstraps " + `message_data["gateway_id"]`
+						self.temporary_bootstraps[message_data["node_id"]] = message_data["gateway_id"]
+					else:
+						response_message = helper.build_routing_table_message(message_data["node_id"], self.node_id, self.socket.getsockname(), self.routing_table)
+						self.response_socket.sendto(response_message, self.routing_table[message_data["gateway_id"]])
+						print "routing table passed back to gateway (" + `message_data["gateway_id"]` + ")"
 
-					response_message = helper.build_routing_table_message(message_data["node_id"], message_data["gateway_id"], self.socket.getsockname(), self.routing_table)
-					self.response_socket.sendto(response_message, self.routing_table[message_data["gateway_id"]])
-					print "routing table passed back to gateway (" + `message_data["gateway_id"]` + ")"
+					
 
 				
 			elif message_data["type"] == helper.routing_info_message:
@@ -82,14 +95,17 @@ class PeerSearchSimplified:
 					self.routing_table[message_data["gateway_id"]] = (message_data["ip_address"], message_data["port"])
 					# add the bootstrap node to the routing table !!!! 
 					print 'save the routing table'
-				else:
-					# check if needs to be passed to gateway or to saved node
-					# if self.node_id == message_data["gateway_id"]: # if the node is the gateway - check temporary bootstraps
-						#check temporary bootstraps HERE TODO
-					print "checking temporary bootstraps"
-					# else: # you are not the gateway yet
-
-					response_message = message_data # copy the routing message
+				else: # if not recipient send routing table to next hop or receiver
+					
+					response_message = json.dumps(message_data, sort_keys=True, indent=4, separators=(',', ': '))
+					if type(self.temporary_bootstraps[message_data["node_id"]]) == tuple:
+						# send routing table straight to saved data
+						self.response_socket.sendto(response_message, self.temporary_bootstraps[message_data["node_id"]])
+					else:
+						# get the ip and port of the node to pass back on
+						self.response_socket.sendto(response_message, (self.routing_table[self.temporary_bootstraps[message_data["node_id"]]]))
+					# remove it from temporary bootstraps
+					self.temporary_bootstraps.pop(message_data["node_id"])
 					print "pass the ROUTING TABLE ONWARDS!>!>!>!>!>!>"
 			elif message_data["type"] == helper.leaving_message:
 				print 'u telling me u want to leave? so fast?'
