@@ -55,12 +55,14 @@ def build_join_message (node_id, target_id, (ip_address, port)):
 	message_structure["port"] = port # the ip address of the joining node
 	return json.dumps(message_structure, sort_keys=True, indent=4, separators=(',', ': '))
 
-def build_join_relay_message (node_id, target_id, gateway_id):
+def build_join_relay_message (node_id, target_id, gateway_id, ip_address, port):
 	message_structure = {}
 	message_structure["type"] = join_relay_message
 	message_structure["node_id"] = node_id
 	message_structure["target_id"] = target_id
 	message_structure["gateway_id"] = gateway_id
+	message_structure["ip_address"] = ip_address
+	message_structure["port"] = port
 	return json.dumps(message_structure, sort_keys=True, indent=4, separators=(',', ': '))
 
 def build_routing_table_message (node_id, gateway_id, (ip_address, port), route_table):

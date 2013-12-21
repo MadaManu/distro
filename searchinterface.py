@@ -48,13 +48,16 @@ class PeerSearchSimplified:
 				else:
 					print "THIS IS THE MINIMUM KEEEY!"
 					print min_key
-					response_message = helper.build_join_relay_message(message_data["node_id"], min_key, self.node_id)
+					response_message = helper.build_join_relay_message(message_data["node_id"], min_key, self.node_id, message_data["ip_address"], message_data["port"])
 					# save the temporary bootstrap
 					self.temporary_bootstraps[message_data["node_id"]] = (str(message_data["ip_address"]), message_data["port"])
 					print "THE MIN KEY IP / PORT"
 					print self.routing_table[min_key][1]
 					# send the relay!
 					self.response_socket.sendto(response_message, self.routing_table[min_key])
+
+
+
 
 			elif message_data["type"] == helper.join_relay_message:
 				print 'the relay message'
@@ -71,6 +74,7 @@ class PeerSearchSimplified:
 							to_be_passed = True
 
 					if to_be_passed:
+						# TODO
 						print "TO BE PASSED AWAY!!!"
 						# add to temporary bootstraps and send to new gateway!
 						print "adding to bootstraps " + `message_data["gateway_id"]`
@@ -79,14 +83,12 @@ class PeerSearchSimplified:
 						response_message = helper.build_routing_table_message(message_data["node_id"], self.node_id, self.socket.getsockname(), self.routing_table)
 						self.response_socket.sendto(response_message, self.routing_table[message_data["gateway_id"]])
 						print "routing table passed back to gateway (" + `message_data["gateway_id"]` + ")"
+						self.routing_table[message_data["node_id"]] = (message_data["ip_address"], message_data["port"])
 
 					
 
 				
 			elif message_data["type"] == helper.routing_info_message:
-
-
-
 				# use the data only if the given node is the recipient
 				if self.node_id == message_data["node_id"]:
 					# save the routing table that we got from bootstraping
@@ -96,7 +98,6 @@ class PeerSearchSimplified:
 					# add the bootstrap node to the routing table !!!! 
 					print 'save the routing table'
 				else: # if not recipient send routing table to next hop or receiver
-					
 					response_message = json.dumps(message_data, sort_keys=True, indent=4, separators=(',', ': '))
 					if type(self.temporary_bootstraps[message_data["node_id"]]) == tuple:
 						# send routing table straight to saved data
