@@ -76,7 +76,7 @@ second_port = UDP_PORT + 1
 second_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 second_socket.bind((UDP_IP, second_port))
 # create second object
-second_object = PeerSearchSimplified(second_socket, 17)
+second_object = PeerSearchSimplified(second_socket, 10)
 
 
 # ask second object to join the network!!!
@@ -90,8 +90,15 @@ second_object.joinNetwork((UDP_IP, UDP_PORT), 42)
 third_port = UDP_PORT + 2
 third_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 third_socket.bind((UDP_IP, third_port))
-third_object = PeerSearchSimplified(third_socket, 15)
+third_object = PeerSearchSimplified(third_socket, 7)
 third_object.joinNetwork((UDP_IP, UDP_PORT), 42)
+
+
+fourth_port = UDP_PORT + 3
+fourth_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+fourth_socket.bind((UDP_IP, fourth_port))
+fourth_object = PeerSearchSimplified(fourth_socket, 9)
+fourth_object.joinNetwork((UDP_IP, UDP_PORT), 42)
 
 # make a node leave
 # third_object.leaveNetwork() 
@@ -102,12 +109,17 @@ print "\n42 ROUTING INFO!!!!"
 first_object.print_routing()
 print "-------------------\n"
 
-print "17 ROUTING INFO!!!!"
+print "10 ROUTING INFO!!!!"
 second_object.print_routing()
 print "-------------------\n"
 
-print "15 ROUTING INFO!!!!"
+print "7 ROUTING INFO!!!!"
 third_object.print_routing()
+print "-------------------\n"
+
+
+print "8 ROUTING INFO!!!!"
+fourth_object.print_routing()
 print "-------------------\n"
 
 # THIS IS HOW TO CHECK IF VALUE IS TUPLE

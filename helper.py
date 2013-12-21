@@ -29,17 +29,19 @@ def hashCode (str_value):
 def append_to_routing_table(existing_table, to_append):
 	if to_append:
 		for key in to_append:
-			existing_table[key] = to_append[key]
+			existing_table[int(key)] = to_append[key]
 	return existing_table
 
 def find_closest_node (routing_table, node_id):
 	min_difference = sys.maxsize
 	min_key = None
+	node_id = int(node_id)
 	if routing_table:
 		for node in routing_table:
-			local_min = node - node_id if node > node_id else node_id - node
+			int_node = int(node)
+			local_min = int_node - node_id if int_node > node_id else node_id - int_node
 			if local_min < min_difference:
-				min_key = node
+				min_key = int_node
 				min_difference = local_min
 	return (min_key, min_difference)
 
