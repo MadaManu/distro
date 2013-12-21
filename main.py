@@ -9,7 +9,6 @@ UDP_PORT = 8767 # default port
 
 
 
-
 port_arg = '--port'
 port_val = None
 boot_arg = '--boot'
@@ -65,17 +64,19 @@ else:
 	if bootstrap_val:
 		UDP_IP = bootstrap_val # connect to the given IP addr
 
+
+
 # bind first socket to selected IP and PORT (because port could be changed from arguments)
 first_socket.bind((UDP_IP, UDP_PORT))
 # create first object
-first_object = PeerSearchSimplified(first_socket, helper.hashCode("distributed"))
+first_object = PeerSearchSimplified(first_socket, 42)
 
 # add one more node to first port+1 and same IP
-second_port = UDP_PORT + 1;
+second_port = UDP_PORT + 1
 second_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 second_socket.bind((UDP_IP, second_port))
 # create second object
-second_object = PeerSearchSimplified(second_socket, helper.hashCode("systems"))
+second_object = PeerSearchSimplified(second_socket, 17)
 
 
 # ask second object to join the network!!!
@@ -83,7 +84,23 @@ second_object = PeerSearchSimplified(second_socket, helper.hashCode("systems"))
 # to be added is just calling the method
 
 # picked the node called distributed as the bootstrap node
-second_object.joinNetwork((UDP_IP, UDP_PORT), helper.hashCode("distributed"))
+second_object.joinNetwork((UDP_IP, UDP_PORT), 42)
 
-while 1:
-	pass
+
+third_port = UDP_PORT + 2
+third_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+third_socket.bind((UDP_IP, third_port))
+
+third_object = PeerSearchSimplified(third_socket, 15)
+
+third_object.joinNetwork((UDP_IP, UDP_PORT), 42)
+raw_input("Press Enter to continue...")
+print "42 ROUTING INFO!"
+first_object.print_routing()
+
+print "17 ROUTING INFO!!!!"
+second_object.print_routing()
+
+print "15 routing info"
+third_object.print_routing()
+

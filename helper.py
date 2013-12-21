@@ -1,5 +1,6 @@
 import json
 import math
+import sys
 
 
 # Helper file containing constant values, and usefull functions
@@ -19,11 +20,23 @@ ack = "ACK"
 # FUNCTIONS
 
 # hash function
-def hashCode(str_value):
+def hashCode (str_value):
 	hash = 0
 	for c in str_value:
 		hash = hash * 31 + ord(c)
 	return math.fabs(hash)
+
+def find_closest_node (routing_table, node_id):
+	min_difference = sys.maxsize
+	min_key = None
+	if routing_table:
+		for node in routing_table:
+			local_min = node - node_id if node > node_id else node_id - node
+			if local_min < min_difference:
+				min_key = node
+				min_difference = local_min
+	return (min_key, min_difference)
+
 
 def build_join_message (node_id, target_id, (ip_address, port)):
 	message_structure = {}
@@ -34,19 +47,21 @@ def build_join_message (node_id, target_id, (ip_address, port)):
 	message_structure["port"] = port # the ip address of the joining node
 	return json.dumps(message_structure, sort_keys=True, indent=4, separators=(',', ': '))
 
-def build_join_relay_message (node_id, gateway_id):
+def build_join_relay_message (node_id, target_id, gateway_id):
 	message_structure = {}
 	message_structure["type"] = join_relay_message
 	message_structure["node_id"] = node_id
+	message_structure["target_id"] = target_id
 	message_structure["gateway_id"] = gateway_id
 	return json.dumps(message_structure, sort_keys=True, indent=4, separators=(',', ': '))
 
-def build_routing_table_message (node_id, (ip_address, port), route_table):
+def build_routing_table_message (node_id, gateway_id, (ip_address, port), route_table):
 	message_structure = {}
 	message_structure["type"] = routing_info_message
 	message_structure["node_id"] = node_id
 	message_structure["ip_address"] = ip_address
 	message_structure["port"] = port
+	message_structure["gateway_id"] = gateway_id
 	message_structure["route_table"] = route_table
 	return json.dumps(message_structure, sort_keys=True, indent=4, separators=(',', ': '))
 
