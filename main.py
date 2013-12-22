@@ -18,51 +18,51 @@ bootstrap_val = None
 id_arg = '--id'
 id_val = None
 
-if boot_arg in sys.argv:
-	try:
-		boot_val = sys.argv[sys.argv.index(boot_arg)+1] 
-	except IndexError:
-		sys.exit('No value for the boot argument. (--boot value) Error!')
-else:
-	if bootstrap_arg in sys.argv and id_arg in sys.argv:
-		try:
-			bootstrap_val = sys.argv[sys.argv.index(bootstrap_arg)+1]
-			try:
-				socket.inet_aton(bootstrap_val)
-			except socket.error:
-				sys.exit('Not a valid IP as bootstrap argument. Error!')
-		except IndexError:
-			sys.exit('No value for the bootstrap argument. (--bootstrap value) Error!')
-		try:
-			id_val = sys.argv[sys.argv.index(id_arg)+1]
-		except IndexError:
-			sys.exit('No value for the id argument. (--id value) Error!')
-	else:
-		if bootstrap_arg not in sys.argv and id_arg not in sys.argv:
-			sys.exit("No arguments specified (--boot or --bootstrap and --id). Error!")
-		if bootstrap_arg not in sys.argv:
-			sys.exit("No bootstrap argument (--bootstrap) given. Error!")
-		if id_arg not in sys.argv:
-			sys.exit("No id argument (--id) given. Error!")
+# if boot_arg in sys.argv:
+# 	try:
+# 		boot_val = sys.argv[sys.argv.index(boot_arg)+1] 
+# 	except IndexError:
+# 		sys.exit('No value for the boot argument. (--boot value) Error!')
+# else:
+# 	if bootstrap_arg in sys.argv and id_arg in sys.argv:
+# 		try:
+# 			bootstrap_val = sys.argv[sys.argv.index(bootstrap_arg)+1]
+# 			try:
+# 				socket.inet_aton(bootstrap_val)
+# 			except socket.error:
+# 				sys.exit('Not a valid IP as bootstrap argument. Error!')
+# 		except IndexError:
+# 			sys.exit('No value for the bootstrap argument. (--bootstrap value) Error!')
+# 		try:
+# 			id_val = sys.argv[sys.argv.index(id_arg)+1]
+# 		except IndexError:
+# 			sys.exit('No value for the id argument. (--id value) Error!')
+# 	else:
+# 		if bootstrap_arg not in sys.argv and id_arg not in sys.argv:
+# 			sys.exit("No arguments specified (--boot or --bootstrap and --id). Error!")
+# 		if bootstrap_arg not in sys.argv:
+# 			sys.exit("No bootstrap argument (--bootstrap) given. Error!")
+# 		if id_arg not in sys.argv:
+# 			sys.exit("No id argument (--id) given. Error!")
 
-if port_arg in sys.argv:
-	port_val = sys.argv[sys.argv.index(port_arg)+1]
+# if port_arg in sys.argv:
+# 	port_val = sys.argv[sys.argv.index(port_arg)+1]
 
-if port_val:
-	if int(port_val) > 65535 or int(port_val) < 0:
-		sys.exit("Port must be 0 - 65535. Error!")
-	else:
-		UDP_PORT = int(port_val)
+# if port_val:
+# 	if int(port_val) > 65535 or int(port_val) < 0:
+# 		sys.exit("Port must be 0 - 65535. Error!")
+# 	else:
+# 		UDP_PORT = int(port_val)
 
 # define the socket to deal with all the connections
 first_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP connections
 
 # assign the specific IP 		
-if boot_val:
-	UDP_IP = "127.0.0.1" # localhost
-else:
-	if bootstrap_val:
-		UDP_IP = bootstrap_val # connect to the given IP addr
+# if boot_val:
+UDP_IP = "127.0.0.1" # localhost
+# else:
+	# if bootstrap_val:
+		# UDP_IP = bootstrap_val # connect to the given IP addr
 
 
 
@@ -97,7 +97,7 @@ third_object.joinNetwork((UDP_IP, UDP_PORT), 42)
 fourth_port = UDP_PORT + 3
 fourth_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 fourth_socket.bind((UDP_IP, fourth_port))
-fourth_object = PeerSearchSimplified(fourth_socket, 8)
+fourth_object = PeerSearchSimplified(fourth_socket, 41)
 fourth_object.joinNetwork((UDP_IP, UDP_PORT), 42)
 
 # make a node leave
