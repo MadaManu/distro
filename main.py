@@ -69,14 +69,14 @@ UDP_IP = "127.0.0.1" # localhost
 # bind first socket to selected IP and PORT (because port could be changed from arguments)
 first_socket.bind((UDP_IP, UDP_PORT))
 # create first object
-first_object = PeerSearchSimplified(first_socket, 42)
+first_object = PeerSearchSimplified(first_socket, "distributed")
 
 # add one more node to first port+1 and same IP
 second_port = UDP_PORT + 1
 second_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 second_socket.bind((UDP_IP, second_port))
 # create second object
-second_object = PeerSearchSimplified(second_socket, 10)
+second_object = PeerSearchSimplified(second_socket, "systems")
 
 
 # ask second object to join the network!!!
@@ -84,21 +84,21 @@ second_object = PeerSearchSimplified(second_socket, 10)
 # to be added is just calling the method
 
 # picked the node called distributed as the bootstrap node
-second_object.joinNetwork((UDP_IP, UDP_PORT), 42)
+second_object.joinNetwork((UDP_IP, UDP_PORT), "distributed")
 
 
 third_port = UDP_PORT + 2
 third_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 third_socket.bind((UDP_IP, third_port))
-third_object = PeerSearchSimplified(third_socket, 7)
-third_object.joinNetwork((UDP_IP, UDP_PORT), 42)
+third_object = PeerSearchSimplified(third_socket, "testing")
+third_object.joinNetwork((UDP_IP, UDP_PORT), "distributed")
 
 
 fourth_port = UDP_PORT + 3
 fourth_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 fourth_socket.bind((UDP_IP, fourth_port))
-fourth_object = PeerSearchSimplified(fourth_socket, 41)
-fourth_object.joinNetwork((UDP_IP, UDP_PORT), 42)
+fourth_object = PeerSearchSimplified(fourth_socket, "tcd")
+fourth_object.joinNetwork((UDP_IP, UDP_PORT), "distributed")
 
 # make a node leave
 # third_object.leaveNetwork() 

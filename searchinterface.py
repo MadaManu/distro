@@ -13,6 +13,7 @@ class PeerSearchSimplified:
 	response_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 	socket = None
 	temporary_bootstraps = {}
+	urls = []
 	
 	# thread function to deal with all the messages that are received
 	def receive_messages(self, socket):
@@ -45,13 +46,13 @@ class PeerSearchSimplified:
 					self.response_socket.sendto(response_message, (message_data["ip_address"], message_data["port"]))
 					# print "routing table sent to joining node"
 					# add the new node to the routing table
-					self.routing_table[int(message_data["node_id"])] = (message_data["ip_address"], message_data["port"])
+					self.routing_table[message_data["node_id"]] = (message_data["ip_address"], message_data["port"])
 					# print "joining node added to routing table"
 
 				else:																		# target,    gateway
 					response_message = helper.build_join_relay_message(message_data["node_id"], min_key, self.node_id, message_data["ip_address"], message_data["port"])
 					# save the temporary bootstrap
-					self.temporary_bootstraps[int(message_data["node_id"])] = (message_data["ip_address"], message_data["port"])
+					self.temporary_bootstraps[message_data["node_id"]] = (message_data["ip_address"], message_data["port"])
 					# print "THE MIN KEY IP / PORT", self.routing_table[min_key]
 					# send the relay!
 					self.response_socket.sendto(response_message, self.routing_table[min_key])
@@ -80,14 +81,14 @@ class PeerSearchSimplified:
 						# add to temporary bootstraps and send to new gateway!
 						# something wierd is happening in some cases here and at routing back the table with these temporary bootstraping values and routing tables
 						response_message = helper.build_join_relay_message(message_data["node_id"], min_key, self.node_id, message_data["ip_address"], message_data["port"])
-						self.temporary_bootstraps[int(message_data["node_id"])] = message_data["gateway_id"]
+						self.temporary_bootstraps[message_data["node_id"]] = message_data["gateway_id"]
 						self.response_socket.sendto(response_message, tuple(self.routing_table[min_key]))
 
 					else:
 						response_message = helper.build_routing_table_message(message_data["node_id"], self.node_id, self.socket.getsockname(), self.routing_table)
 						self.response_socket.sendto(response_message, self.routing_table[message_data["gateway_id"]])
 						# print "routing table passed back to gateway (" + `message_data["gateway_id"]` + ")"
-						self.routing_table[int(message_data["node_id"])] = (message_data["ip_address"], message_data["port"])
+						self.routing_table[message_data["node_id"]] = (message_data["ip_address"], message_data["port"])
 
 					
 
@@ -136,7 +137,7 @@ class PeerSearchSimplified:
 	def __init__ (self, udp_socket, node_id):
 		# initialise with a udp socket
 		self.socket = udp_socket
-		self.node_id = node_id
+		self.node_id = helper.hashCode(node_id)
 		self.routing_table = {}
 		# print self.socket.getsockname()
 		try:
@@ -147,6 +148,7 @@ class PeerSearchSimplified:
 # removed the need for identifier because the node that want's to join the network already has its own
 # identifier saved as an attribute, therefore no need to pass it in.
 	def joinNetwork (self, (bootstrap_node_ip,bootstrap_node_port), target_identifier):
+		target_identifier = helper.hashCode(target_identifier)
 		# print "JOINING! (bootstrap @ "+ bootstrap_node_ip + ':' + `bootstrap_node_port` + ')'
 		message = helper.build_join_message(self.node_id, target_identifier, self.socket.getsockname())
 		self.response_socket.sendto(message, (bootstrap_node_ip, bootstrap_node_port))
@@ -160,6 +162,7 @@ class PeerSearchSimplified:
 		
 
 	def indexPage (self, url, unique_words):
+
 		print (url+' '+str(unique_words))
 
 	def search (self, words):
