@@ -169,18 +169,13 @@ class PeerSearchSimplified:
 	# changed from list of unique_words to one word to index multiple urls
 	def indexPage (self, word, list_of_urls):
 		node_id_to_send_to = int(helper.hashCode(word))
-		print `node_id_to_send_to` + "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
 		response_message = helper.build_index_message (node_id_to_send_to, self.node_id, word, list_of_urls)
 		# find the ip and port to send to the index message
-		# print response_message
 		if node_id_to_send_to in self.routing_table:
-			print "IN THE ROUTING TABLE"
 			ip_port_addr = self.routing_table[node_id_to_send_to]
 		else:
-			print "NOT"
-			(min_key, min_difference) = helper.find_closest_node(self.routing_table, node_id_to_send_to)
 			# find closest one to send to from the routing table
-
+			(min_key, min_difference) = helper.find_closest_node(self.routing_table, node_id_to_send_to)
 			ip_port_addr = self.routing_table[min_key]
 
 		self.response_socket.sendto(response_message, ip_port_addr)

@@ -15,6 +15,7 @@ search = "SEARCH"
 search_response_type = "SEARCH_RESPONSE"
 ping = "PING"
 ack = "ACK"
+ack_index_message = "ACK_INDEX"
 
 
 # FUNCTIONS
@@ -122,18 +123,8 @@ def build_ack_message (node_id, ip_address):
 	message_structure["ip_address"] = ip_address
 	return json.dumps(message_structure, sort_keys=True, indent=4, separators=(',', ': '))
 
-
-
-# you should send a an url to that node from any other node
-
-# node11.index("tcd.com",TCD)
-
-# node1 recieves this and link the URL to the keyword
-
-# and you build a list
-
-# search is when you give a keyword TCD
-
-# you message the node that has the keyword TCD
-
-# and it should return the list of URL
+def build_ack_index_message (node_id, keyword):
+	message_structure = {}
+	message_structure["type"] = ack_index_message
+	message_structure["node_id"] = node_id
+	message_structure["keyword"] = keyword
