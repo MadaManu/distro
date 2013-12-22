@@ -4,62 +4,19 @@ import sys
 from searchinterface import PeerSearchSimplified
 import helper
 
-UDP_IP = None
+UDP_IP = "127.0.0.1" # localhost
 UDP_PORT = 8767 # default port
 
 
 
-port_arg = '--port'
-port_val = None
-boot_arg = '--boot'
-boot_val = None
-bootstrap_arg = '--bootstrap'
-bootstrap_val = None
-id_arg = '--id'
-id_val = None
 
-# if boot_arg in sys.argv:
-# 	try:
-# 		boot_val = sys.argv[sys.argv.index(boot_arg)+1] 
-# 	except IndexError:
-# 		sys.exit('No value for the boot argument. (--boot value) Error!')
-# else:
-# 	if bootstrap_arg in sys.argv and id_arg in sys.argv:
-# 		try:
-# 			bootstrap_val = sys.argv[sys.argv.index(bootstrap_arg)+1]
-# 			try:
-# 				socket.inet_aton(bootstrap_val)
-# 			except socket.error:
-# 				sys.exit('Not a valid IP as bootstrap argument. Error!')
-# 		except IndexError:
-# 			sys.exit('No value for the bootstrap argument. (--bootstrap value) Error!')
-# 		try:
-# 			id_val = sys.argv[sys.argv.index(id_arg)+1]
-# 		except IndexError:
-# 			sys.exit('No value for the id argument. (--id value) Error!')
-# 	else:
-# 		if bootstrap_arg not in sys.argv and id_arg not in sys.argv:
-# 			sys.exit("No arguments specified (--boot or --bootstrap and --id). Error!")
-# 		if bootstrap_arg not in sys.argv:
-# 			sys.exit("No bootstrap argument (--bootstrap) given. Error!")
-# 		if id_arg not in sys.argv:
-# 			sys.exit("No id argument (--id) given. Error!")
-
-# if port_arg in sys.argv:
-# 	port_val = sys.argv[sys.argv.index(port_arg)+1]
-
-# if port_val:
-# 	if int(port_val) > 65535 or int(port_val) < 0:
-# 		sys.exit("Port must be 0 - 65535. Error!")
-# 	else:
-# 		UDP_PORT = int(port_val)
 
 # define the socket to deal with all the connections
 first_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP connections
 
 # assign the specific IP 		
 # if boot_val:
-UDP_IP = "127.0.0.1" # localhost
+
 # else:
 	# if bootstrap_val:
 		# UDP_IP = bootstrap_val # connect to the given IP addr
@@ -107,13 +64,16 @@ fourth_object.joinNetwork((UDP_IP, UDP_PORT), "distributed")
 
 
 
-raw_input("Press Enter to continue...")
+raw_input("Press Enter to index some pages...")
 first_object.indexPage("systems", ["url1","url2","url3","url4"])
 second_object.indexPage("systems", ["url2","NEW URL", "url3"])
 fourth_object.indexPage("systems", ["url2","NEW URL", "url3"])
 
+raw_input("Press Enter to search...")
+first_object.search("tcd")
 
-raw_input("Press Enter to continue...")
+
+raw_input("Press Enter to display routing table and data stored...")
 print "\n42 ROUTING INFO!!!!"
 first_object.print_routing()
 print "-------------------\n"
@@ -131,10 +91,3 @@ print "-------------------\n"
 print "8 ROUTING INFO!!!!"
 fourth_object.print_routing()
 print "-------------------\n"
-
-# THIS IS HOW TO CHECK IF VALUE IS TUPLE
-# if type(4567890) is tuple:
-# 	print "yes"
-# else:
-# 	print "no"
-
