@@ -13,7 +13,7 @@ class PeerSearchSimplified:
 	response_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 	socket = None
 	temporary_bootstraps = {}
-	urls = []
+	urls = {}
 	
 	# thread function to deal with all the messages that are received
 	def receive_messages(self, socket):
@@ -46,7 +46,7 @@ class PeerSearchSimplified:
 					self.response_socket.sendto(response_message, (message_data["ip_address"], message_data["port"]))
 					# print "routing table sent to joining node"
 					# add the new node to the routing table
-					self.routing_table[message_data["node_id"]] = (message_data["ip_address"], message_data["port"])
+					self.routing_table[int(message_data["node_id"])] = (message_data["ip_address"], message_data["port"])
 					# print "joining node added to routing table"
 
 				else:																		# target,    gateway
@@ -55,7 +55,7 @@ class PeerSearchSimplified:
 					self.temporary_bootstraps[message_data["node_id"]] = (message_data["ip_address"], message_data["port"])
 					# print "THE MIN KEY IP / PORT", self.routing_table[min_key]
 					# send the relay!
-					self.response_socket.sendto(response_message, self.routing_table[min_key])
+					self.response_socket.sendto(response_message, self.routing_table[int(min_key)])
 
 
 
@@ -82,13 +82,13 @@ class PeerSearchSimplified:
 						# something wierd is happening in some cases here and at routing back the table with these temporary bootstraping values and routing tables
 						response_message = helper.build_join_relay_message(message_data["node_id"], min_key, self.node_id, message_data["ip_address"], message_data["port"])
 						self.temporary_bootstraps[message_data["node_id"]] = message_data["gateway_id"]
-						self.response_socket.sendto(response_message, tuple(self.routing_table[min_key]))
+						self.response_socket.sendto(response_message, tuple(self.routing_table[int(min_key)]))
 
 					else:
 						response_message = helper.build_routing_table_message(message_data["node_id"], self.node_id, self.socket.getsockname(), self.routing_table)
-						self.response_socket.sendto(response_message, self.routing_table[message_data["gateway_id"]])
+						self.response_socket.sendto(response_message, self.routing_table[int(message_data["gateway_id"])])
 						# print "routing table passed back to gateway (" + `message_data["gateway_id"]` + ")"
-						self.routing_table[message_data["node_id"]] = (message_data["ip_address"], message_data["port"])
+						self.routing_table[int(message_data["node_id"])] = (message_data["ip_address"], message_data["port"])
 
 					
 
@@ -99,7 +99,7 @@ class PeerSearchSimplified:
 					# save the routing table that we got from bootstraping
 					self.routing_table = helper.append_to_routing_table(self.routing_table, message_data["route_table"])
 					# self.routing_table = message_data["route_table"]
-					self.routing_table[message_data["gateway_id"]] = (message_data["ip_address"], message_data["port"])
+					self.routing_table[int(message_data["gateway_id"])] = (message_data["ip_address"], message_data["port"])
 					# add the bootstrap node to the routing table !!!! 
 					# print 'save the routing table'
 				else: # if not recipient send routing table to next hop or receiver
@@ -110,7 +110,7 @@ class PeerSearchSimplified:
 						self.response_socket.sendto(response_message, self.temporary_bootstraps[message_data["node_id"]])
 					else:
 						# get the ip and port of the node to pass back on
-						self.response_socket.sendto(response_message, self.routing_table[self.temporary_bootstraps[message_data["node_id"]]])
+						self.response_socket.sendto(response_message, self.routing_table[int(self.temporary_bootstraps[message_data["node_id"]])])
 					# remove it from temporary bootstraps
 					self.temporary_bootstraps.pop(message_data["node_id"])
 					# print "pass the ROUTING TABLE ONWARDS!>!>!>!>!>!>"
@@ -119,12 +119,18 @@ class PeerSearchSimplified:
 
 			elif message_data["type"] == helper.leaving_message:
 				# just remove the node_id from your routing table
-				if message_data["node_id"] in self.routing_table:
+				if int(message_data["node_id"]) in self.routing_table:
 					self.routing_table.pop(message_data["node_id"])
 
 
 			elif message_data["type"] == helper.index_message:
-				print 'let me index that for u'
+				# print message_data["keyword"]
+				for link in message_data["link"]:
+					if link in self.urls:
+						self.urls[link] = self.urls[link] + 1
+					else:
+						self.urls[link] = 1
+				# print 'I TRY TO INDEX SHIT UP FOR U!!!!'
 			elif message_data["type"] == helper.search:
 				print 'what do we search?'
 			elif message_data["type"] == helper.search_response_type:
@@ -160,10 +166,25 @@ class PeerSearchSimplified:
 			print self.routing_table[node]
 			self.response_socket.sendto(response_message, tuple(self.routing_table[node]))
 		
+	# changed from list of unique_words to one word to index multiple urls
+	def indexPage (self, word, list_of_urls):
+		node_id_to_send_to = int(helper.hashCode(word))
+		print `node_id_to_send_to` + "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+		response_message = helper.build_index_message (node_id_to_send_to, self.node_id, word, list_of_urls)
+		# find the ip and port to send to the index message
+		# print response_message
+		if node_id_to_send_to in self.routing_table:
+			print "IN THE ROUTING TABLE"
+			ip_port_addr = self.routing_table[node_id_to_send_to]
+		else:
+			print "NOT"
+			(min_key, min_difference) = helper.find_closest_node(self.routing_table, node_id_to_send_to)
+			# find closest one to send to from the routing table
 
-	def indexPage (self, url, unique_words):
+			ip_port_addr = self.routing_table[min_key]
 
-		print (url+' '+str(unique_words))
+		self.response_socket.sendto(response_message, ip_port_addr)
+
 
 	def search (self, words):
 		print ('HEllo')
@@ -171,3 +192,8 @@ class PeerSearchSimplified:
 	def print_routing(self):
 		for key in self.routing_table:
 			print `key` + ">>" + str(self.routing_table[key])
+
+	def print_data(self):
+		print '\n'
+		for key in self.urls:
+			print `key` + "-->" + str(self.urls[key])

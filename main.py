@@ -104,6 +104,15 @@ fourth_object.joinNetwork((UDP_IP, UDP_PORT), "distributed")
 # third_object.leaveNetwork() 
 
 
+
+
+
+raw_input("Press Enter to continue...")
+first_object.indexPage("systems", ["url1","url2","url3","url4"])
+second_object.indexPage("systems", ["url2","NEW URL", "url3"])
+fourth_object.indexPage("systems", ["url2","NEW URL", "url3"])
+
+
 raw_input("Press Enter to continue...")
 print "\n42 ROUTING INFO!!!!"
 first_object.print_routing()
@@ -111,6 +120,7 @@ print "-------------------\n"
 
 print "10 ROUTING INFO!!!!"
 second_object.print_routing()
+second_object.print_data()
 print "-------------------\n"
 
 print "7 ROUTING INFO!!!!"

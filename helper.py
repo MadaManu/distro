@@ -24,12 +24,12 @@ def hashCode (str_value):
 	hash = 0
 	for c in str_value:
 		hash = hash * 31 + ord(c)
-	return math.fabs(hash)
+	return abs(hash)
 
 def append_to_routing_table(existing_table, to_append):
 	if to_append:
 		for key in to_append:
-			existing_table[key] = to_append[key]
+			existing_table[int(key)] = to_append[key]
 	return existing_table
 
 def find_closest_node (routing_table, node_id):
