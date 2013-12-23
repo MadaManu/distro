@@ -1,7 +1,7 @@
-CS4032 - Distributed Systems Project
+# CS4032 - Distributed Systems Project
 
-Vladut M. Druta
-10345527
+### Vladut M. Druta
+### 10345527
 
 In order to run the tests, execute the file main.py (optional argument --port and the value of the port to use). If no specific port given it will default to start from: 8767
 Warning: The program will run 4 ports including the specified one in ascending order!
