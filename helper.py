@@ -21,6 +21,7 @@ ack_index_message = "ACK_INDEX"
 
 # FUNCTIONS
 
+# prettyPrint function
 def prettyPrint(data):
 	pp = pprint.PrettyPrinter(width=60)
 	pp.pprint(data)
@@ -32,12 +33,15 @@ def hashCode (str_value):
 		hash = hash * 31 + ord(c)
 	return abs(hash)
 
+# function to append dict to another dict by keeping tuples 
+# in place and keys as int desired for type unification
 def append_to_routing_table(existing_table, to_append):
 	if to_append:
 		for key in to_append:
-			existing_table[int(key)] = to_append[key]
+			existing_table[int(key)] = tuple(to_append[key]) # enforce tuple values and int as key
 	return existing_table
 
+# find the closest node to the specified node from the supplied routing table
 def find_closest_node (routing_table, node_id):
 	min_difference = sys.maxsize
 	min_key = None
@@ -49,16 +53,16 @@ def find_closest_node (routing_table, node_id):
 			if local_min < min_difference:
 				min_key = int_node
 				min_difference = local_min
-	return (min_key, min_difference)
-
+	return (min_key, min_difference) # return a tuple containing the smallest distance found 
+									# and the key at which the distance is smallest
 
 def build_join_message (node_id, target_id, (ip_address, port)):
 	message_structure = {}
 	message_structure["type"] = join_message
-	message_structure["node_id"] = node_id # a non-negative number of order 2'^32^', indicating the id of the joining node
-	message_structure["target_id"] = target_id # a non-negative number of order 2'^32^', indicating the target node for this message
-	message_structure["ip_address"] = ip_address # the ip address of the joining node
-	message_structure["port"] = port # the ip address of the joining node
+	message_structure["node_id"] = node_id
+	message_structure["target_id"] = target_id
+	message_structure["ip_address"] = ip_address
+	message_structure["port"] = port
 	return json.dumps(message_structure, sort_keys=True, indent=4, separators=(',', ': '))
 
 def build_join_relay_message (node_id, target_id, gateway_id, ip_address, port):
