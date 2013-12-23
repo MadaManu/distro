@@ -116,11 +116,25 @@ class PeerSearchSimplified:
 
 
 			elif message_data["type"] == helper.index_message:
-				for link in message_data["link"]:
-					if link in self.urls:
-						self.urls[link] = self.urls[link] + 1
+				if message_data["target_id"] == self.node_id:
+					# save all links in node
+					for link in message_data["link"]:
+						if link in self.urls:
+							self.urls[link] = self.urls[link] + 1
+						else:
+							self.urls[link] = 1
+					# send ACK once DONE! TODO
+				else:
+					response_message = helper.build_index_message (message_data["target_id"], message_data["sender_id"], message_data["keyword"], message_data["link"]):
+					# pass on the index message
+					if message_data["target_id"] in self.routing_table:
+						ip_port_addr = tuple(self.routing_table[int(message_data["target_id"])])
 					else:
-						self.urls[link] = 1
+						(min_key, min_difference) = helper.find_closest_node(self.routing_table, message_data["target_id"])
+						ip_port_addr = self.routing_table[min_key]
+
+					self.socket.sendto(response_message, ip_port_addr)
+
 
 
 
@@ -142,8 +156,18 @@ class PeerSearchSimplified:
 					ip_port_addr = self.routing_table[min_key]
 					self.socket.sendto(response_message, ip_port_addr)
 
+
+
+
 			elif message_data["type"] == helper.search_response_type:
-				print 'this is the response of my search?'
+				if message_data["node_id"] == self.node_id:
+					print "Search response: \n"
+					print message_data["response"]
+				print '\n'
+
+
+
+
 			elif message_data["type"] == helper.ping:
 				print 'Do u really want to know if i\'m alive?'
 			elif message_data["type"] == helper.ack:
@@ -179,29 +203,42 @@ class PeerSearchSimplified:
 	# changed from list of unique_words to one word to index multiple urls
 	def indexPage (self, word, list_of_urls):
 		node_id_to_send_to = int(helper.hashCode(word))
-		response_message = helper.build_index_message (node_id_to_send_to, self.node_id, word, list_of_urls)
-		# find the ip and port to send to the index message
-		if node_id_to_send_to in self.routing_table:
-			ip_port_addr = self.routing_table[node_id_to_send_to]
-		else:
-			# find closest one to send to from the routing table
-			(min_key, min_difference) = helper.find_closest_node(self.routing_table, node_id_to_send_to)
-			ip_port_addr = self.routing_table[min_key]
 
-		self.response_socket.sendto(response_message, ip_port_addr)
+		if node_id_to_send_to == self.node_id:
+			for url in list_of_urls:
+				if url in self.urls:
+					self.urls[url] = self.urls[url] + 1
+				else:
+					self.urls[url] = 1
+		else:
+			response_message = helper.build_index_message (node_id_to_send_to, self.node_id, word, list_of_urls)
+			# pass on the message
+			# find the ip and port to send to the index message
+			if node_id_to_send_to in self.routing_table:
+				# check local routing for match
+				ip_port_addr = self.routing_table[node_id_to_send_to]
+			else:
+				# find closest one to send to from the routing table
+				(min_key, min_difference) = helper.find_closest_node(self.routing_table, node_id_to_send_to)
+				ip_port_addr = self.routing_table[min_key]
+			self.response_socket.sendto(response_message, ip_port_addr)
 
 
 	def search (self, word):
 		node_id_to_send_to = int(helper.hashCode(word))
-		response_message = helper.build_search_message(word, node_id_to_send_to, self.node_id)
-		if node_id_to_send_to in self.routing_table:
-			ip_port_addr = self.routing_table[node_id_to_send_to]
+		if node_id_to_send_to == self.node_id:
+			print "FOUND!"
+			print self.urls
 		else:
-			# find closest one to send to from the routing table
-			(min_key, min_difference) = helper.find_closest_node(self.routing_table, node_id_to_send_to)
-			ip_port_addr = self.routing_table[min_key]
+			response_message = helper.build_search_message(word, node_id_to_send_to, self.node_id)
+			if node_id_to_send_to in self.routing_table:
+				ip_port_addr = self.routing_table[node_id_to_send_to]
+			else:
+				# find closest one to send to from the routing table
+				(min_key, min_difference) = helper.find_closest_node(self.routing_table, node_id_to_send_to)
+				ip_port_addr = self.routing_table[min_key]
 
-		self.response_socket.sendto(response_message, ip_port_addr)
+			self.response_socket.sendto(response_message, ip_port_addr)
 
 	def print_routing(self):
 		for key in self.routing_table:
