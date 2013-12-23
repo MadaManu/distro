@@ -116,7 +116,7 @@ class PeerSearchSimplified:
 
 
 			elif message_data["type"] == helper.index_message:
-				if message_data["target_id"] == self.node_id:
+				if int(message_data["target_id"]) == int(self.node_id):
 					# save all links in node
 					for link in message_data["link"]:
 						if link in self.urls:
@@ -125,7 +125,7 @@ class PeerSearchSimplified:
 							self.urls[link] = 1
 					# send ACK once DONE! TODO
 				else:
-					response_message = helper.build_index_message (message_data["target_id"], message_data["sender_id"], message_data["keyword"], message_data["link"]):
+					response_message = helper.build_index_message (message_data["target_id"], message_data["sender_id"], message_data["keyword"], message_data["link"])
 					# pass on the index message
 					if message_data["target_id"] in self.routing_table:
 						ip_port_addr = tuple(self.routing_table[int(message_data["target_id"])])
@@ -148,9 +148,10 @@ class PeerSearchSimplified:
 					else:
 						(min_key, min_difference) = helper.find_closest_node(self.routing_table, message_data["sender_id"])
 						ip_port_addr = self.routing_table[min_key]
+
 					self.socket.sendto(response_message, ip_port_addr)
 				else:
-					# find closest one to send to from the routing table
+					# find closest one to send to from the routing table and pass the search message
 					response_message = helper.build_search_message(message_data["node_id"], message_data["node_id"], message_data["sender_id"])
 					(min_key, min_difference) = helper.find_closest_node(self.routing_table, message_data["node_id"])
 					ip_port_addr = self.routing_table[min_key]
@@ -167,7 +168,6 @@ class PeerSearchSimplified:
 
 
 
-
 			elif message_data["type"] == helper.ping:
 				print 'Do u really want to know if i\'m alive?'
 			elif message_data["type"] == helper.ack:
@@ -180,6 +180,7 @@ class PeerSearchSimplified:
 		self.socket = udp_socket
 		self.node_id = helper.hashCode(node_id)
 		self.routing_table = {}
+		self.urls = {}
 
 		try:
 			thread.start_new_thread( self.receive_messages, (udp_socket,) )
@@ -203,7 +204,6 @@ class PeerSearchSimplified:
 	# changed from list of unique_words to one word to index multiple urls
 	def indexPage (self, word, list_of_urls):
 		node_id_to_send_to = int(helper.hashCode(word))
-
 		if node_id_to_send_to == self.node_id:
 			for url in list_of_urls:
 				if url in self.urls:
@@ -216,22 +216,25 @@ class PeerSearchSimplified:
 			# find the ip and port to send to the index message
 			if node_id_to_send_to in self.routing_table:
 				# check local routing for match
-				ip_port_addr = self.routing_table[node_id_to_send_to]
+				ip_port_addr = tuple(self.routing_table[node_id_to_send_to])
 			else:
 				# find closest one to send to from the routing table
 				(min_key, min_difference) = helper.find_closest_node(self.routing_table, node_id_to_send_to)
-				ip_port_addr = self.routing_table[min_key]
+				ip_port_addr = tuple(self.routing_table[min_key])
 			self.response_socket.sendto(response_message, ip_port_addr)
 
 
 	def search (self, word):
 		node_id_to_send_to = int(helper.hashCode(word))
+
 		if node_id_to_send_to == self.node_id:
 			print "FOUND!"
 			print self.urls
 		else:
 			response_message = helper.build_search_message(word, node_id_to_send_to, self.node_id)
+			# find the ip and port to send to the index message
 			if node_id_to_send_to in self.routing_table:
+				# check local routing for match
 				ip_port_addr = self.routing_table[node_id_to_send_to]
 			else:
 				# find closest one to send to from the routing table
