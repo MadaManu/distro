@@ -77,7 +77,7 @@ second_object.indexPage("distributed", ["url2","NEW URL", "url3"])
 fourth_object.indexPage("systems", ["url2","NEW URL", "url3"])
 
 raw_input("Press Enter to search...\n")
-fourth_object.search("tcd")
+fourth_object.search("distributed")
 
 
 raw_input("Press Enter to display routing table and data stored...\n")

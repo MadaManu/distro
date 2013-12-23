@@ -160,7 +160,7 @@ class PeerSearchSimplified:
 
 			elif message_data["type"] == helper.search_response_type:
 				if message_data["node_id"] == self.node_id:
-					print "Search response for" + message_data["word"] + ": \n"
+					print "Search response for '" + message_data["word"] + "': \n"
 					helper.prettyPrint(message_data["response"])
 				else:
 					response_message = helper.build_search_response_message(message_data["word"], message_data["node_id"], message_data["sender_id"], message_data["response"])
@@ -170,7 +170,7 @@ class PeerSearchSimplified:
 					else:
 						(min_key, min_difference) = helper.find_closest_node(self.routing_table, message_data["node_id"])
 						ip_port_addr = tuple(self.routing_table[min_key])
-					response_socket.sendto(response_message, ip_port_addr)
+					self.response_socket.sendto(response_message, ip_port_addr)
 				print '\n'
 
 
@@ -237,7 +237,7 @@ class PeerSearchSimplified:
 		node_id_to_send_to = int(helper.hashCode(word))
 
 		if node_id_to_send_to == self.node_id:
-			print "Search response: \n"
+			print "Search response for '" + word +"': \n"
 			print self.urls
 		else:
 			response_message = helper.build_search_message(word, node_id_to_send_to, self.node_id)
