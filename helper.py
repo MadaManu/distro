@@ -133,3 +133,4 @@ def build_ack_index_message (node_id, keyword):
 	message_structure["type"] = ack_index_message
 	message_structure["node_id"] = node_id
 	message_structure["keyword"] = keyword
+	return json.dumps(message_structure, sort_keys=True, indent=4, separators=(',', ': '))

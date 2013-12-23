@@ -67,7 +67,6 @@ class PeerSearchSimplified:
 							to_be_passed = False
 
 					if to_be_passed:
-						# TODo
 						# add to temporary bootstraps and send to new gateway!
 						# something wierd is happening in some cases here and at routing back the table with these temporary bootstraping values and routing tables
 						response_message = helper.build_join_relay_message(message_data["node_id"], min_key, self.node_id, message_data["ip_address"], message_data["port"])
@@ -121,7 +120,14 @@ class PeerSearchSimplified:
 							self.urls[link] = self.urls[link] + 1
 						else:
 							self.urls[link] = 1
-					# send ACK once DONE! TODO
+					# send ACK
+					response_message = helper.build_ack_index_message(message_data["sender_id"], message_data["keyword"])
+					if message_data["sender_id"] in self.routing_table:
+						ip_port_addr = tuple(self.routing_table[message_data["sender_id"]])
+					else:
+						(min_key, min_difference) = helper.find_closest_node(self.routing_table, message_data["sender_id"])
+						ip_port_addr = tuple(self.routing_table[min_key])
+					self.response_socket.sendto(response_message, ip_port_addr)
 				else:
 					response_message = helper.build_index_message (message_data["target_id"], message_data["sender_id"], message_data["keyword"], message_data["link"])
 					# pass on the index message
@@ -180,10 +186,23 @@ class PeerSearchSimplified:
 				# assumption that the nodes requested will always be there
 				print 'Am I alive?'
 
+
 			elif message_data["type"] == helper.ack:
-				print 'ok... u acknowledged... i take count of that'
+				print 'ack received'
+
+
 			elif message_data["type"] == helper.ack_index_message:
-				print "y acknowledged the indexing"
+				if message_data["node_id"] == self.node_id:
+					print "ACK for indexing keyword (" + message_data["keyword"] + ") received."
+				else:
+					response_message = helper.build_ack_index_message(message_data["node_id"], message_data["keyword"])
+					if message_data["node_id"] in self.routing_table:
+						ip_port_addr = tuple(self.routing_table[message_data["node_id"]])
+					else:
+						(min_key, min_difference) = helper.find_closest_node(self.routing_table, message_data["node_id"])
+						ip_port_addr = tuple(self.routing_table[min_key])
+					self.response_socket.sendto(response_message, ip_port_addr)
+
 	
 	def __init__ (self, udp_socket, node_id):
 		# initialise with a udp socket
