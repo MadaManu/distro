@@ -5,8 +5,6 @@ import json
 import helper
 
 
-
-
 class PeerSearchSimplified:
 	node_id = None
 	routing_table = {}
@@ -191,7 +189,6 @@ class PeerSearchSimplified:
 # identifier saved as an attribute, therefore no need to pass it in.
 	def joinNetwork (self, (bootstrap_node_ip,bootstrap_node_port), target_identifier):
 		target_identifier = helper.hashCode(target_identifier)
-		
 		message = helper.build_join_message(self.node_id, target_identifier, self.socket.getsockname())
 		self.response_socket.sendto(message, (bootstrap_node_ip, bootstrap_node_port))
 
@@ -228,7 +225,7 @@ class PeerSearchSimplified:
 		node_id_to_send_to = int(helper.hashCode(word))
 
 		if node_id_to_send_to == self.node_id:
-			print "FOUND!"
+			print "Search response: \n"
 			print self.urls
 		else:
 			response_message = helper.build_search_message(word, node_id_to_send_to, self.node_id)
@@ -244,10 +241,12 @@ class PeerSearchSimplified:
 			self.response_socket.sendto(response_message, ip_port_addr)
 
 	def print_routing(self):
-		for key in self.routing_table:
-			print `key` + ">>" + str(self.routing_table[key])
+		helper.prettyPrint(self.routing_table)
+		# for key in self.routing_table:
+		# 	print `key` + ">>" + str(self.routing_table[key])
 
 	def print_data(self):
 		print '\n'
-		for key in self.urls:
-			print `key` + "-->" + str(self.urls[key])
+		helper.prettyPrint(self.urls)
+		# for key in self.urls:
+		# 	print `key` + "-->" + str(self.urls[key])

@@ -1,6 +1,7 @@
 import json
 import math
 import sys
+import pprint
 
 
 # Helper file containing constant values, and usefull functions
@@ -19,6 +20,10 @@ ack_index_message = "ACK_INDEX"
 
 
 # FUNCTIONS
+
+def prettyPrint(data):
+	pp = pprint.PrettyPrinter(width=60)
+	pp.pprint(data)
 
 # hash function
 def hashCode (str_value):

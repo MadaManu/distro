@@ -64,16 +64,16 @@ fourth_object.joinNetwork((UDP_IP, UDP_PORT), "distributed")
 
 
 
-raw_input("Press Enter to index some pages...")
+raw_input("Press Enter to index some pages...\n")
 first_object.indexPage("systems", ["url1","url2","url3","url4"])
 second_object.indexPage("distributed", ["url2","NEW URL", "url3"])
 fourth_object.indexPage("systems", ["url2","NEW URL", "url3"])
 
-raw_input("Press Enter to search...")
-fourth_object.search("systems")
+raw_input("Press Enter to search...\n")
+fourth_object.search("tcd")
 
 
-raw_input("Press Enter to display routing table and data stored...")
+raw_input("Press Enter to display routing table and data stored...\n")
 print "\n42 ROUTING INFO!!!!"
 first_object.print_routing()
 first_object.print_data()
