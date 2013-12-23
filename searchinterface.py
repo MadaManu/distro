@@ -129,7 +129,7 @@ class PeerSearchSimplified:
 						ip_port_addr = tuple(self.routing_table[int(message_data["target_id"])])
 					else:
 						(min_key, min_difference) = helper.find_closest_node(self.routing_table, message_data["target_id"])
-						ip_port_addr = self.routing_table[min_key]
+						ip_port_addr = tuple(self.routing_table[min_key])
 
 					self.socket.sendto(response_message, ip_port_addr)
 
@@ -145,14 +145,14 @@ class PeerSearchSimplified:
 						ip_port_addr = tuple(self.routing_table[int(message_data["sender_id"])])
 					else:
 						(min_key, min_difference) = helper.find_closest_node(self.routing_table, message_data["sender_id"])
-						ip_port_addr = self.routing_table[min_key]
+						ip_port_addr = tuple(self.routing_table[min_key])
 
 					self.socket.sendto(response_message, ip_port_addr)
 				else:
 					# find closest one to send to from the routing table and pass the search message
 					response_message = helper.build_search_message(message_data["node_id"], message_data["node_id"], message_data["sender_id"])
 					(min_key, min_difference) = helper.find_closest_node(self.routing_table, message_data["node_id"])
-					ip_port_addr = self.routing_table[min_key]
+					ip_port_addr = tuple(self.routing_table[min_key])
 					self.socket.sendto(response_message, ip_port_addr)
 
 
@@ -160,14 +160,26 @@ class PeerSearchSimplified:
 
 			elif message_data["type"] == helper.search_response_type:
 				if message_data["node_id"] == self.node_id:
-					print "Search response: \n"
-					print message_data["response"]
+					print "Search response for" + message_data["word"] + ": \n"
+					helper.prettyPrint(message_data["response"])
+				else:
+					response_message = helper.build_search_response_message(message_data["word"], message_data["node_id"], message_data["sender_id"], message_data["response"])
+					# route the response to target
+					if message_data["node_id"] in self.routing_table:
+						ip_port_addr = tuple(self.routing_table[int(message_data["node_id"])])
+					else:
+						(min_key, min_difference) = helper.find_closest_node(self.routing_table, message_data["node_id"])
+						ip_port_addr = tuple(self.routing_table[min_key])
+					response_socket.sendto(response_message, ip_port_addr)
 				print '\n'
 
 
 
 			elif message_data["type"] == helper.ping:
-				print 'Do u really want to know if i\'m alive?'
+				# Ping not necessary as in the simplified version there's an 
+				# assumption that the nodes requested will always be there
+				print 'Am I alive?'
+
 			elif message_data["type"] == helper.ack:
 				print 'ok... u acknowledged... i take count of that'
 			elif message_data["type"] == helper.ack_index_message:
@@ -232,11 +244,11 @@ class PeerSearchSimplified:
 			# find the ip and port to send to the index message
 			if node_id_to_send_to in self.routing_table:
 				# check local routing for match
-				ip_port_addr = self.routing_table[node_id_to_send_to]
+				ip_port_addr = tuple(self.routing_table[node_id_to_send_to])
 			else:
 				# find closest one to send to from the routing table
 				(min_key, min_difference) = helper.find_closest_node(self.routing_table, node_id_to_send_to)
-				ip_port_addr = self.routing_table[min_key]
+				ip_port_addr = tuple(self.routing_table[min_key])
 
 			self.response_socket.sendto(response_message, ip_port_addr)
 
