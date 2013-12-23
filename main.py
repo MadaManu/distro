@@ -7,21 +7,28 @@ import helper
 UDP_IP = "127.0.0.1" # localhost
 UDP_PORT = 8767 # default port
 
+# GET ARG for the starting PORT
 
+if len(sys.argv)>1:
+	if "--port" in sys.argv:
+		port_val = None
+		try:
+			port_val = int(sys.argv[sys.argv.index("--port")+1])
+		except IndexError:
+			sys.exit('No value for the port argument (--port value). Error')
+		if port_val> 65530 or port_val < 0:
+			sys.exit("Port must be 0 - 65530. Error")
+		else:
+			UDP_PORT = port_val
+	else:
+		sys.exit("Command line argument not accepted! (only --port). Error")
+else:
+	print "Port not specified using as default: " + `UDP_PORT`
 
 
 
 # define the socket to deal with all the connections
 first_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP connections
-
-# assign the specific IP 		
-# if boot_val:
-
-# else:
-	# if bootstrap_val:
-		# UDP_IP = bootstrap_val # connect to the given IP addr
-
-
 
 # bind first socket to selected IP and PORT (because port could be changed from arguments)
 first_socket.bind((UDP_IP, UDP_PORT))
@@ -74,23 +81,27 @@ fourth_object.search("tcd")
 
 
 raw_input("Press Enter to display routing table and data stored...\n")
-print "\n42 ROUTING INFO!!!!"
+print "42 ROUTING INFO!!!!"
 first_object.print_routing()
+print "-------------------"
 first_object.print_data()
-print "-------------------\n"
+print "===================\n"
 
 print "10 ROUTING INFO!!!!"
 second_object.print_routing()
+print "-------------------"
 second_object.print_data()
-print "-------------------\n"
+print "===================\n"
 
 print "7 ROUTING INFO!!!!"
 third_object.print_routing()
+print "-------------------"
 third_object.print_data()
-print "-------------------\n"
+print "===================\n"
 
 
 print "8 ROUTING INFO!!!!"
 fourth_object.print_routing()
+print "-------------------"
 fourth_object.print_data()
-print "-------------------\n"
+print "===================\n"

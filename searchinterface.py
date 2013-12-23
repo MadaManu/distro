@@ -242,11 +242,6 @@ class PeerSearchSimplified:
 
 	def print_routing(self):
 		helper.prettyPrint(self.routing_table)
-		# for key in self.routing_table:
-		# 	print `key` + ">>" + str(self.routing_table[key])
 
 	def print_data(self):
-		print '\n'
 		helper.prettyPrint(self.urls)
-		# for key in self.urls:
-		# 	print `key` + "-->" + str(self.urls[key])
